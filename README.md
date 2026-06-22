@@ -10,20 +10,28 @@ local development and CI stay in sync (use [asdf](https://asdf-vm.com) or
 
 - **Elixir** `1.15.8` (OTP 25)
 - **Erlang/OTP** `25.3.2.21`
-- **PostgreSQL** (a local server reachable at `localhost:5432`)
+- **Docker & Docker Compose** (for local PostgreSQL; see [database setup docs](docs/06-database-setup.md))
 
 ## Running the Phoenix app
 
 From the repository root:
 
 ```sh
-mix setup            # fetch deps, create/migrate the DB, install & build assets
-mix phx.server       # start the server at http://localhost:4000
+# Start the local PostgreSQL database
+docker-compose up -d postgres
+
+# Fetch deps, create/migrate the DB, install & build assets
+mix setup
+
+# Start the server at http://localhost:4000
+mix phx.server
 ```
 
 `mix setup` runs `mix deps.get`, `mix ecto.setup`, and the asset build. If you
 prefer to run the steps individually, use `mix deps.get`, `mix ecto.create`,
 `mix ecto.migrate`, then `mix phx.server`.
+
+See [database setup docs](docs/06-database-setup.md) for more details on PostgreSQL configuration.
 
 ## Development tooling
 
