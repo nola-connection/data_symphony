@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data Symphony MVP</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <header class="masthead">
+          <div>
+            <p class="eyebrow">Data Symphony MVP</p>
+            <h1>Turn a CSV into a playable data composition.</h1>
+          </div>
+          <button id="load-sample" class="secondary-button" type="button">Load sample CSV</button>
+        </header>
+
+        <section class="panel upload-panel" aria-labelledby="upload-title">
+          <div>
+            <h2 id="upload-title">Dataset</h2>
+            <p id="dataset-summary">Upload a CSV or load the sample dataset.</p>
+          </div>
+          <label class="drop-zone" for="csv-file">
+            <input id="csv-file" type="file" accept=".csv,text/csv" />
+            <span>Choose CSV</span>
+          </label>
+        </section>
+
+        <section class="grid">
+          <section class="panel" aria-labelledby="preview-title">
+            <div class="panel-heading">
+              <h2 id="preview-title">Preview</h2>
+              <span id="preview-count" class="meta">No rows</span>
+            </div>
+            <div id="preview-table" class="table-wrap empty-state">No dataset loaded.</div>
+          </section>
+
+          <section class="panel" aria-labelledby="mapping-title">
+            <div class="panel-heading">
+              <h2 id="mapping-title">Mapping</h2>
+              <span id="mapping-state" class="meta">Waiting for data</span>
+            </div>
+            <div class="global-controls">
+              <label>
+                Tempo
+                <input id="tempo" type="range" min="60" max="180" value="120" />
+                <output id="tempo-output">120 BPM</output>
+              </label>
+              <label>
+                Scale
+                <select id="scale">
+                  <option value="major">Major</option>
+                  <option value="minor">Minor</option>
+                  <option value="pentatonic">Pentatonic</option>
+                </select>
+              </label>
+              <label>
+                Note division
+                <select id="note-division">
+                  <option value="1/4" selected>1/4</option>
+                  <option value="1/8">1/8</option>
+                  <option value="1/16">1/16</option>
+                  <option value="1/2">1/2</option>
+                </select>
+              </label>
+              <label>
+                Synth
+                <select id="synth">
+                  <option value="sine">Sine</option>
+                  <option value="square">Square</option>
+                  <option value="triangle">Triangle</option>
+                  <option value="sawtooth">Sawtooth</option>
+                </select>
+              </label>
+            </div>
+            <div id="mapping-controls" class="mapping-list empty-state">Load a dataset to map columns.</div>
+            <button id="generate" class="primary-button" type="button" disabled>Generate composition</button>
+          </section>
+        </section>
+
+        <section class="panel player-panel" aria-labelledby="player-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="player-title">Playback & Visualization</h2>
+              <p id="sequence-summary">Generate a sequence to play it here.</p>
+            </div>
+            <div class="transport">
+              <button id="play" type="button" disabled>Play</button>
+              <button id="pause" type="button" disabled>Pause</button>
+              <button id="stop" type="button" disabled>Stop</button>
+              <button id="save" class="secondary-button" type="button" disabled>Save</button>
+            </div>
+          </div>
+          <canvas id="visualizer" width="1200" height="420" aria-label="Synchronized sequence visualization"></canvas>
+          <div class="timeline">
+            <progress id="progress" max="100" value="0"></progress>
+            <span id="time-readout">0:00 / 0:00</span>
+          </div>
+        </section>
+      </section>
+
+      <aside class="panel library" aria-labelledby="library-title">
+        <div class="panel-heading">
+          <h2 id="library-title">Saved Sequences</h2>
+          <button id="clear-library" class="icon-button" type="button" aria-label="Clear saved sequences">Clear</button>
+        </div>
+        <div id="saved-list" class="saved-list empty-state">No saved sequences yet.</div>
+      </aside>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
