@@ -19,8 +19,8 @@ jobs:
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: "27.3"
-          elixir-version: "1.18.4"
+          otp-version: "25.3.2.21"
+          elixir-version: "1.15.8"
 
       - name: Cache deps and build
         uses: actions/cache@v4
@@ -47,8 +47,8 @@ jobs:
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: "27.3"
-          elixir-version: "1.18.4"
+          otp-version: "25.3.2.21"
+          elixir-version: "1.15.8"
 
       - name: Cache deps and build
         uses: actions/cache@v4
@@ -70,13 +70,28 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: data_symphony_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: "27.3"
-          elixir-version: "1.18.4"
+          otp-version: "25.3.2.21"
+          elixir-version: "1.15.8"
 
       - name: Cache deps and build
         uses: actions/cache@v4
@@ -96,3 +111,42 @@ jobs:
 
       - name: Run tests
         run: mix test
+
+  dialyzer:
+    name: Dialyzer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "25.3.2.21"
+          elixir-version: "1.15.8"
+
+      - name: Cache deps and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-dialyzer-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-dialyzer-
+
+      - name: Cache Dialyzer PLTs
+        uses: actions/cache@v4
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-plt-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-plt-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Build PLTs
+        run: mix dialyzer --plt
+
+      - name: Run Dialyzer
+        run: mix dialyzer --format github
