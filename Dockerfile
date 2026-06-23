@@ -5,7 +5,7 @@
 # environment variables / Fly secrets in config/runtime.exs.
 ARG ELIXIR_VERSION=1.15.8
 ARG OTP_VERSION=25.3.2.21
-ARG DEBIAN_VERSION=bullseye-20240701-slim
+ARG DEBIAN_VERSION=bullseye-20260610-slim
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
