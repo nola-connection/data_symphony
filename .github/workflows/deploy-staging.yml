@@ -1,0 +1,29 @@
+name: Deploy Staging
+
+# Automatically deploy the staging Fly.io app on every push to `main`.
+# Production is a separate app and is deployed manually (see fly.toml / OPS-2).
+on:
+  push:
+    branches:
+      - main
+
+# Never run two staging deploys at once; let the latest commit win.
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io staging
+    runs-on: ubuntu-latest
+    # FLY_API_TOKEN is stored as a GitHub Actions secret, never in source.
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy staging
+        run: flyctl deploy --remote-only --config fly.staging.toml --app data-symphony-staging
