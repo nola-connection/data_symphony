@@ -7,6 +7,7 @@ defmodule DataSymphony.Application do
   def start(_type, _args) do
     children = [
       DataSymphonyWeb.Telemetry,
+      DataSymphony.TelemetryHandlers,
       DataSymphony.Repo,
       {DNSCluster, query: Application.get_env(:data_symphony, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DataSymphony.PubSub},
