@@ -23,6 +23,14 @@ config :data_symphony, DataSymphonyWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warning
 
+# Structured logging with metadata for testing
+config :logger, :console,
+  format: {DataSymphony.Logger.StructuredFormatter, :format},
+  metadata: [:request_id, :user_id, :job_id, :duration_ms]
+
+# Enable dev routes for testing
+config :data_symphony, dev_routes: true
+
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 

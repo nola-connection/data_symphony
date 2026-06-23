@@ -11,5 +11,10 @@ config :data_symphony, DataSymphonyWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Structured logging with metadata in production
+config :logger, :console,
+  format: {DataSymphony.Logger.StructuredFormatter, :format},
+  metadata: [:request_id, :user_id, :job_id, :duration_ms]
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

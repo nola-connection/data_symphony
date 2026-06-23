@@ -36,6 +36,7 @@ defmodule DataSymphonyWeb.Router do
 
     scope "/dev" do
       pipe_through :browser
+      pipe_through DataSymphonyWeb.AdminAuthPlug
 
       live_dashboard "/dashboard", metrics: DataSymphonyWeb.Telemetry
     end

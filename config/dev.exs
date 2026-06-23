@@ -65,8 +65,10 @@ config :data_symphony, DataSymphonyWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :data_symphony, dev_routes: true
 
-# Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+# Structured logging with metadata for development
+config :logger, :console,
+  format: {DataSymphony.Logger.StructuredFormatter, :format},
+  metadata: [:request_id, :user_id, :job_id, :duration_ms]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
