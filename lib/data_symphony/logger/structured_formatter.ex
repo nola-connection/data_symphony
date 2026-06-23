@@ -5,6 +5,9 @@ defmodule DataSymphony.Logger.StructuredFormatter do
   Emits logs with key-value pairs including request/job metadata for production observability.
   """
 
+  # Metadata keys surfaced in structured output (mirrors config/*.exs :metadata).
+  @metadata_keys [:request_id, :user_id, :job_id, :duration_ms]
+
   def format(level, message, timestamp, metadata) do
     # Extract standard fields
     base_fields = %{
@@ -13,15 +16,11 @@ defmodule DataSymphony.Logger.StructuredFormatter do
       "message" => IO.chardata_to_string(message)
     }
 
-    # Add optional metadata fields if present
+    # Keep only the whitelisted metadata, stringifying keys in a single pass
     metadata_fields =
-      metadata
-      |> Enum.filter(fn {key, _} ->
-        key in [:request_id, :user_id, :job_id, :duration_ms]
-      end)
-      |> Enum.into(%{})
-      |> Enum.map(fn {k, v} -> {"#{k}", v} end)
-      |> Enum.into(%{})
+      for {key, value} <- metadata, key in @metadata_keys, into: %{} do
+        {Atom.to_string(key), value}
+      end
 
     # Combine all fields
     all_fields = Map.merge(base_fields, metadata_fields)
@@ -64,22 +63,11 @@ defmodule DataSymphony.Logger.StructuredFormatter do
     end
   end
 
-  defp format_timestamp({date, time}) do
-    {year, month, day} = date
-    {hour, minute, second, millisecond} = time
-
-    "#{year}-#{pad(month)}-#{pad(day)} #{pad(hour)}:#{pad(minute)}:#{pad(second)}.#{pad_ms(millisecond)}"
-  end
-
-  defp pad(value) do
-    value
-    |> Integer.to_string()
-    |> String.pad_leading(2, "0")
-  end
-
-  defp pad_ms(millisecond) do
-    millisecond
-    |> Integer.to_string()
-    |> String.pad_leading(3, "0")
+  # Logger hands us Erlang's calendar tuple; NaiveDateTime renders it (with
+  # zero-padding and the millisecond fraction) without hand-rolled helpers.
+  defp format_timestamp({date, {hour, minute, second, millisecond}}) do
+    {date, {hour, minute, second}}
+    |> NaiveDateTime.from_erl!({millisecond * 1000, 3})
+    |> NaiveDateTime.to_string()
   end
 end
