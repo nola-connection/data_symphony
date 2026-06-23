@@ -2,17 +2,14 @@ defmodule DataSymphonyWeb.AdminAuthPlug do
   @moduledoc """
   Plug for authenticating admin access to LiveDashboard and other protected routes.
 
-  In development, all access is allowed. In production, requires HTTP Basic Auth
-  with credentials from environment variables:
-  - ADMIN_USERNAME
-  - ADMIN_PASSWORD
+  In development (`:dev_routes` enabled) all access is allowed. On staging and
+  production the router mounts the `/dev` LiveDashboard scope unconditionally
+  (see `DataSymphonyWeb.Router`), so this plug enforces HTTP Basic Auth using
+  credentials from environment variables:
+  - ADMIN_USERNAME (defaults to "admin")
+  - ADMIN_PASSWORD (required; access is denied when unset)
 
-  TODO(F-5): The `/dev` scope in the router is compile-gated on `:dev_routes`,
-  which is currently only true in dev/test, so this plug bypasses auth wherever
-  the route exists and never reaches `authenticate_admin/1`. Real staging /
-  production enforcement (a non-local environment that exposes LiveDashboard)
-  is wired up as part of the Fly.io deploy scaffold (F-5); until that lands this
-  module is scaffolding and the credential logic below is intentionally dormant.
+  Set these on the Fly app via `fly secrets set` — never commit them.
   """
 
   import Plug.Conn

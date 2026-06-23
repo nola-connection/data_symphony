@@ -1,0 +1,37 @@
+# Fly.io configuration for the STAGING Phoenix app.
+#
+# Staging is a SEPARATE Fly app from production (see fly.toml) so deploys from
+# `main` never touch prod. This config is deployed automatically by
+# .github/workflows/deploy-staging.yml on every push to `main`.
+#
+# Secrets are NEVER stored here. Set them on the staging app with:
+#   fly secrets set --app data-symphony-staging \
+#     SECRET_KEY_BASE=... DATABASE_URL=... ADMIN_USERNAME=... ADMIN_PASSWORD=...
+# See docs/06-database-setup.md for DATABASE_URL (Neon) details.
+
+app = 'data-symphony-staging'
+primary_region = 'iad'
+
+[build]
+
+[env]
+  PHX_HOST = 'data-symphony-staging.fly.dev'
+  PORT = '8080'
+  ECTO_IPV6 = 'true'
+  DNS_CLUSTER_QUERY = 'data-symphony-staging.internal'
+
+[deploy]
+  release_command = '/app/bin/migrate'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1

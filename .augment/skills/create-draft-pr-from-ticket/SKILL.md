@@ -1,16 +1,19 @@
 ---
-name: create-pr-from-ticket
+name: create-draft-pr-from-ticket
 description: >-
-  Create a GitHub pull request from a GitHub issue/ticket URL and link the
+  Create a GitHub draft pull request from a GitHub issue/ticket URL and link the
   ticket inside the PR. Use this when the user asks to open or create a PR from
   a ticket, issue, or task URL. Derives the PR title from the ticket title,
   summarizes changes as a bulleted list, adds sensible tests, targets the main
-  branch by default, and never merges the PR automatically.
+  branch by default, always opens the PR as a draft, and never merges the PR
+  automatically.
 ---
 
-# Create a PR from a GitHub Ticket
+# Create a Draft PR from a GitHub Ticket
 
-Open a pull request that implements a GitHub ticket and links back to it.
+Open a **draft** pull request that implements a GitHub ticket and links back to
+it. The PR is always created as a draft so the human author can review it and
+mark it ready for review themselves.
 
 ## Inputs
 
@@ -35,11 +38,15 @@ If the ticket URL is missing, ask the user for it before proceeding.
    Match the project's current standards and practices. Do not add tests that do
    not apply to the change. When the ticket defines acceptance criteria, the
    tests must explicitly verify each criterion.
-5. **Never auto-merge.** Do NOT merge the PR. Merging is reserved for the human
+5. **Always open as a draft.** Create the PR as a draft (`gh pr create --draft`).
+   Never open it as ready for review and never mark an existing PR ready for
+   review — converting a draft to a regular PR is the human author's decision
+   after they have reviewed it.
+6. **Never auto-merge.** Do NOT merge the PR. Merging is reserved for the human
    author/reviewer. Do not enable auto-merge, squash, or rebase-merge.
-6. **Target `main` by default.** Point the PR at the `main` branch unless the
+7. **Target `main` by default.** Point the PR at the `main` branch unless the
    user explicitly specifies a different base branch.
-7. **Link the ticket in the PR.** Reference the ticket in the PR body using a
+8. **Link the ticket in the PR.** Reference the ticket in the PR body using a
    linking keyword (e.g. `Closes #<number>`) plus the full ticket URL so the
    ticket and PR are connected.
 
@@ -115,13 +122,15 @@ git commit -m "<Title-Case verb-first message, referencing the ticket>"
 git push -u origin "$(git branch --show-current)"
 ```
 
-### 6. Open the PR (targeting `main` by default)
+### 6. Open the PR as a draft (targeting `main` by default)
 
 Build the PR body with a bulleted change list and a link to the ticket, then
-create the PR. Do not merge it.
+create the PR **as a draft** (`--draft`). Do not merge it and do not mark it
+ready for review.
 
 ```sh
 gh pr create \
+  --draft \
   --base main \
   --title "<title from ticket>" \
   --body "$(cat <<'EOF'
@@ -152,11 +161,17 @@ defines criteria; omit it otherwise.
 
 ### 7. Report back
 
-Share the created PR URL with the user. Explicitly note that the PR has NOT been
-merged and that merging is up to the human author/reviewer.
+Share the created PR URL with the user. Explicitly note that:
+
+- the PR is a **draft** and has NOT been merged, and
+- once they have reviewed it and it is ready, **they** should convert it to a
+  regular PR (mark it ready for review) — for example via the "Ready for review"
+  button on the PR, or `gh pr ready <number>`.
 
 ## Guardrails
 
+- Always create the PR as a draft (`--draft`); never mark a PR ready for review
+  (`gh pr ready`) — that is the human author's call after review.
 - Never run `gh pr merge`, never enable auto-merge, and never push directly to
   `main`.
 - If tests fail, fix them before opening the PR rather than opening a broken PR.

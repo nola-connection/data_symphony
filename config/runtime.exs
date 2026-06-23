@@ -31,7 +31,8 @@ if config_env() == :prod do
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :data_symphony, DataSymphony.Repo,
-    # ssl: true,
+    # Neon (and most managed Postgres) requires TLS. See docs/06-database-setup.md.
+    ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
