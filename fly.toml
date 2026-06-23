@@ -1,27 +1,22 @@
-# Fly.io configuration for the PRODUCTION Phoenix app.
+# fly.toml app configuration file generated for data-symphony on 2026-06-23T12:08:57Z
 #
-# Production deploys are out of scope for F-5 (see OPS-2) — this file is the
-# committed baseline so staging (fly.staging.toml) stays a faithful mirror of
-# prod. Deploy explicitly with: `fly deploy --config fly.toml`.
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
-# Secrets are NEVER stored here. Set them out of band with `fly secrets set`:
-#   fly secrets set SECRET_KEY_BASE=... DATABASE_URL=... \
-#                   ADMIN_USERNAME=... ADMIN_PASSWORD=...
-# See docs/06-database-setup.md for DATABASE_URL (Neon) details.
 
 app = 'data-symphony'
 primary_region = 'iad'
+kill_signal = 'SIGTERM'
 
 [build]
 
-[env]
-  PHX_HOST = 'data-symphony.fly.dev'
-  PORT = '8080'
-  ECTO_IPV6 = 'true'
-  DNS_CLUSTER_QUERY = 'data-symphony.internal'
-
 [deploy]
   release_command = '/app/bin/migrate'
+
+[env]
+  DNS_CLUSTER_QUERY = 'data-symphony.internal'
+  ECTO_IPV6 = 'true'
+  PHX_HOST = 'data-symphony.fly.dev'
+  PORT = '8080'
 
 [http_service]
   internal_port = 8080
@@ -31,7 +26,13 @@ primary_region = 'iad'
   min_machines_running = 1
   processes = ['app']
 
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 1000
+    soft_limit = 1000
+
 [[vm]]
   memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 256
