@@ -10,7 +10,7 @@ defmodule DataSymphony.Logger.StructuredFormatter do
     base_fields = %{
       "timestamp" => format_timestamp(timestamp),
       "level" => level,
-      "message" => to_string(message)
+      "message" => IO.chardata_to_string(message)
     }
 
     # Add optional metadata fields if present
@@ -26,11 +26,16 @@ defmodule DataSymphony.Logger.StructuredFormatter do
     # Combine all fields
     all_fields = Map.merge(base_fields, metadata_fields)
 
-    # Format as JSON-like output for prod or readable format for dev
+    # Format as JSON output for prod or readable format for dev. `:env` is set
+    # from config_env() in config/config.exs; read at runtime (not compile time)
+    # so the prod branch stays reachable in dev/test builds.
     case Application.get_env(:data_symphony, :env, :dev) do
       :prod -> format_json(all_fields)
       _ -> format_readable(all_fields)
     end
+  rescue
+    # A formatter must never raise, or logging breaks. Fall back to a safe line.
+    _ -> "[#{level}] #{inspect(message)}\n"
   end
 
   defp format_json(fields) do

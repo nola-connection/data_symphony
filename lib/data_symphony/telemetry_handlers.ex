@@ -26,29 +26,25 @@ defmodule DataSymphony.TelemetryHandlers do
 
   # Phoenix handlers - log request information with duration
   defp attach_phoenix_handlers do
-    :telemetry.attach(
-      "phoenix-request-stop",
-      [:phoenix, :endpoint, :stop],
-      &handle_phoenix_stop/4,
-      nil
-    )
+    reattach("phoenix-request-stop", [:phoenix, :endpoint, :stop], &handle_phoenix_stop/4)
 
-    :telemetry.attach(
+    reattach(
       "phoenix-router-exception",
       [:phoenix, :router_dispatch, :exception],
-      &handle_phoenix_exception/4,
-      nil
+      &handle_phoenix_exception/4
     )
   end
 
   # Ecto handlers - log database query information
   defp attach_ecto_handlers do
-    :telemetry.attach(
-      "ecto-query-total-time",
-      [:data_symphony, :repo, :query],
-      &handle_ecto_query/4,
-      nil
-    )
+    reattach("ecto-query-total-time", [:data_symphony, :repo, :query], &handle_ecto_query/4)
+  end
+
+  # Attach idempotently so a supervisor/app restart in the same VM does not
+  # crash with {:error, :already_exists} on a duplicate handler id.
+  defp reattach(id, event, fun) do
+    :telemetry.detach(id)
+    :telemetry.attach(id, event, fun, nil)
   end
 
   # Handle Phoenix endpoint stop events

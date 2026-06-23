@@ -5,6 +5,9 @@ config :data_symphony,
   ecto_repos: [DataSymphony.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+# Track the current environment for runtime branching (e.g. log formatting)
+config :data_symphony, :env, config_env()
+
 # Configures the endpoint
 config :data_symphony, DataSymphonyWeb.Endpoint,
   url: [host: "localhost"],

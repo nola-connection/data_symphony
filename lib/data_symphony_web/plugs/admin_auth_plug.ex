@@ -6,6 +6,13 @@ defmodule DataSymphonyWeb.AdminAuthPlug do
   with credentials from environment variables:
   - ADMIN_USERNAME
   - ADMIN_PASSWORD
+
+  TODO(F-5): The `/dev` scope in the router is compile-gated on `:dev_routes`,
+  which is currently only true in dev/test, so this plug bypasses auth wherever
+  the route exists and never reaches `authenticate_admin/1`. Real staging /
+  production enforcement (a non-local environment that exposes LiveDashboard)
+  is wired up as part of the Fly.io deploy scaffold (F-5); until that lands this
+  module is scaffolding and the credential logic below is intentionally dormant.
   """
 
   import Plug.Conn
@@ -23,27 +30,11 @@ defmodule DataSymphonyWeb.AdminAuthPlug do
   end
 
   defp authenticate_admin(conn) do
-    case parse_credentials(conn) do
-      {username, password} ->
-        if valid_credentials?(username, password) do
-          conn
-        else
-          unauthorized(conn)
-        end
-
-      :error ->
-        unauthorized(conn)
-    end
-  end
-
-  defp parse_credentials(conn) do
-    with [auth_header] <- Plug.Conn.get_req_header(conn, "authorization"),
-         ["Basic", encoded] <- String.split(auth_header),
-         {:ok, decoded} <- Base.decode64(encoded),
-         [username, password] <- String.split(decoded, ":", parts: 2) do
-      {username, password}
+    with {username, password} <- Plug.BasicAuth.parse_basic_auth(conn),
+         true <- valid_credentials?(username, password) do
+      conn
     else
-      _ -> :error
+      _ -> conn |> Plug.BasicAuth.request_basic_auth(realm: "admin") |> halt()
     end
   end
 
@@ -56,15 +47,11 @@ defmodule DataSymphonyWeb.AdminAuthPlug do
         false
 
       _ ->
-        username == expected_username and
-          password == expected_password
+        # Compute both comparisons before combining to avoid short-circuit
+        # timing leaks; secure_compare/2 is itself constant-time.
+        valid_username? = Plug.Crypto.secure_compare(username, expected_username)
+        valid_password? = Plug.Crypto.secure_compare(password, expected_password)
+        valid_username? and valid_password?
     end
-  end
-
-  defp unauthorized(conn) do
-    conn
-    |> put_resp_header("www-authenticate", "Basic realm=\"admin\"")
-    |> send_resp(401, "Unauthorized")
-    |> halt()
   end
 end

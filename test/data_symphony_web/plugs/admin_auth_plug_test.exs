@@ -26,14 +26,13 @@ defmodule DataSymphonyWeb.AdminAuthPlugTest do
       refute result.halted
     end
 
-    test "returns 401 unauthorized when no credentials provided in prod" do
-      # This test would need to test prod mode, but we can't easily switch
-      # environments in tests. The logic is covered by the dev test above
-      # since dev_routes is true in test env.
+    test "bypasses auth in dev even when no credentials are provided" do
+      # `dev_routes` is true in the test env, so the plug short-circuits before
+      # ever evaluating credentials. Prod/staging enforcement is wired up in
+      # F-5 (see AdminAuthPlug TODO) and is covered there.
       conn = Phoenix.ConnTest.build_conn(:get, "/dev/dashboard")
       result = AdminAuthPlug.call(conn, [])
 
-      # In dev, should pass through
       refute result.halted
     end
   end

@@ -77,11 +77,19 @@ defmodule DataSymphony.TelemetryBaselineTest do
   end
 
   describe "telemetry handlers attachment" do
-    test "phoenix endpoint telemetry events are being emitted" do
-      # Make a simple request to trigger telemetry
-      conn = Phoenix.ConnTest.build_conn(:get, "/")
-      # Just verify the conn can be built - the handlers will process the event
-      assert conn.method == "GET"
+    test "phoenix and ecto handlers are attached to their events" do
+      handler_ids =
+        [
+          [:phoenix, :endpoint, :stop],
+          [:phoenix, :router_dispatch, :exception],
+          [:data_symphony, :repo, :query]
+        ]
+        |> Enum.flat_map(&:telemetry.list_handlers/1)
+        |> Enum.map(& &1.id)
+
+      assert "phoenix-request-stop" in handler_ids
+      assert "phoenix-router-exception" in handler_ids
+      assert "ecto-query-total-time" in handler_ids
     end
   end
 end
