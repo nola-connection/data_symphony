@@ -1,6 +1,8 @@
 defmodule DataSymphonyWeb.Router do
   use DataSymphonyWeb, :router
 
+  import Phoenix.LiveDashboard.Router
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -25,20 +27,14 @@ defmodule DataSymphonyWeb.Router do
   #   pipe_through :api
   # end
 
-  # Enable LiveDashboard in development
-  if Application.compile_env(:data_symphony, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
-    import Phoenix.LiveDashboard.Router
+  # LiveDashboard is mounted in every environment and gated by AdminAuthPlug:
+  # open in dev (`:dev_routes`) and behind HTTP Basic Auth (ADMIN_USERNAME /
+  # ADMIN_PASSWORD) on staging and production. This is the F-5 wiring that
+  # replaces the former dev-only, compile-gated scope.
+  scope "/dev" do
+    pipe_through :browser
+    pipe_through DataSymphonyWeb.AdminAuthPlug
 
-    scope "/dev" do
-      pipe_through :browser
-      pipe_through DataSymphonyWeb.AdminAuthPlug
-
-      live_dashboard "/dashboard", metrics: DataSymphonyWeb.Telemetry
-    end
+    live_dashboard "/dashboard", metrics: DataSymphonyWeb.Telemetry
   end
 end
