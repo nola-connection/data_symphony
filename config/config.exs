@@ -8,6 +8,10 @@ config :data_symphony,
 # Track the current environment for runtime branching (e.g. log formatting)
 config :data_symphony, :env, config_env()
 
+# Blob storage: dev and test use the filesystem adapter; prod selects the
+# S3-compatible adapter in config/runtime.exs. See DataSymphony.BlobStorage.
+config :data_symphony, DataSymphony.BlobStorage, adapter: DataSymphony.BlobStorage.Filesystem
+
 # Configures the endpoint
 config :data_symphony, DataSymphonyWeb.Endpoint,
   url: [host: "localhost"],

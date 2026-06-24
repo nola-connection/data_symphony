@@ -54,6 +54,21 @@ if config_env() == :prod do
 
   config :data_symphony, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  # Blob storage: switch to the S3-compatible adapter when object storage is
+  # configured. Credentials come from the environment (see OPS-1); when unset
+  # the filesystem default from config/config.exs remains in effect.
+  if bucket = System.get_env("S3_BUCKET") do
+    config :data_symphony, DataSymphony.BlobStorage, adapter: DataSymphony.BlobStorage.S3
+
+    config :data_symphony, DataSymphony.BlobStorage.S3,
+      host: System.get_env("S3_HOST") || "s3.amazonaws.com",
+      bucket: bucket,
+      region: System.get_env("S3_REGION") || "us-east-1",
+      scheme: System.get_env("S3_SCHEME") || "https",
+      access_key_id: System.get_env("S3_ACCESS_KEY_ID"),
+      secret_access_key: System.get_env("S3_SECRET_ACCESS_KEY")
+  end
+
   config :data_symphony, DataSymphonyWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [

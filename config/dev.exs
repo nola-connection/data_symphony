@@ -65,6 +65,10 @@ config :data_symphony, DataSymphonyWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :data_symphony, dev_routes: true
 
+# Local blob storage root (gitignored disposable artifacts).
+config :data_symphony, DataSymphony.BlobStorage.Filesystem,
+  root: Path.expand("../priv/blob_storage/dev", __DIR__)
+
 # Structured logging with metadata for development
 config :logger, :console,
   format: {DataSymphony.Logger.StructuredFormatter, :format},

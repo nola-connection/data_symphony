@@ -31,6 +31,11 @@ config :logger, :console,
 # Enable dev routes for testing
 config :data_symphony, dev_routes: true
 
+# Default blob storage root for tests; individual tests override this with an
+# isolated temporary directory.
+config :data_symphony, DataSymphony.BlobStorage.Filesystem,
+  root: Path.expand("../tmp/blob_storage/test", __DIR__)
+
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 
