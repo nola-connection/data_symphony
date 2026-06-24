@@ -20,7 +20,8 @@ defmodule DataSymphony.MixProject do
   def application do
     [
       mod: {DataSymphony.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      # :inets/:ssl power the S3 blob storage adapter's :httpc client.
+      extra_applications: [:logger, :runtime_tools, :inets, :ssl]
     ]
   end
 
@@ -57,6 +58,8 @@ defmodule DataSymphony.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      # CA bundle for the S3 blob storage adapter's TLS verification.
+      {:castore, "~> 1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
