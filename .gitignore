@@ -38,3 +38,6 @@ npm-debug.log
 # Dialyzer PLT files are build artifacts.
 /priv/plts/
 
+# Local filesystem blob storage (disposable dev/test artifacts).
+/priv/blob_storage/
+
