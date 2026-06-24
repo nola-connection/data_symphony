@@ -19,6 +19,12 @@ defmodule DataSymphony.BlobStorage.S3 do
 
   Optional keys: `:scheme` (default `"https"`) and `:url_expires_in` (presigned
   URL lifetime in seconds, default `3600`).
+
+  The required keys (`:bucket`, `:host`, `:access_key_id`,
+  `:secret_access_key`) are resolved on each call and raise `ArgumentError`
+  when missing. This is deliberate: a misconfigured deployment should fail
+  loudly rather than return a runtime `{:error, _}` from `c:put/2`, `c:get/1`,
+  or `c:url/1`.
   """
 
   @behaviour DataSymphony.BlobStorage

@@ -30,18 +30,15 @@ defmodule DataSymphony.BlobStorage.Filesystem do
   def get(ref) when is_binary(ref) do
     with {:ok, path} <- resolve(ref) do
       case File.read(path) do
-        {:ok, contents} -> {:ok, contents}
         {:error, :enoent} -> {:error, :not_found}
-        {:error, reason} -> {:error, reason}
+        result -> result
       end
     end
   end
 
   @impl true
   def url(ref) when is_binary(ref) do
-    with {:ok, path} <- resolve(ref) do
-      {:ok, "file://" <> path}
-    end
+    with {:ok, path} <- resolve(ref), do: {:ok, "file://" <> path}
   end
 
   @doc """
