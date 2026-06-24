@@ -15,9 +15,10 @@ defmodule DataSymphony.BlobStorage.S3.Signer do
   @service "s3"
 
   @type config :: %{
-          access_key_id: String.t(),
-          secret_access_key: String.t(),
-          region: String.t()
+          :access_key_id => String.t(),
+          :secret_access_key => String.t(),
+          :region => String.t(),
+          optional(atom()) => term()
         }
 
   @doc """
