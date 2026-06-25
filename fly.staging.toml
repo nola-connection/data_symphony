@@ -17,7 +17,6 @@ primary_region = 'iad'
 [env]
   PHX_HOST = 'data-symphony-staging.fly.dev'
   PORT = '8080'
-  ECTO_IPV6 = 'true'
   DNS_CLUSTER_QUERY = 'data-symphony-staging.internal'
 
 [deploy]

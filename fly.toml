@@ -14,7 +14,6 @@ kill_signal = 'SIGTERM'
 
 [env]
   DNS_CLUSTER_QUERY = 'data-symphony.internal'
-  ECTO_IPV6 = 'true'
   PHX_HOST = 'data-symphony.fly.dev'
   PORT = '8080'
 
