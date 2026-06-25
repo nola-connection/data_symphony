@@ -42,6 +42,11 @@ mix dialyzer                   # type/spec analysis (PLTs cached in priv/plts)
 mix test                       # ExUnit test suite
 ```
 
+Code structure and style follow the
+[Style & Architecture Guidelines](docs/09-style-and-architecture-guidelines.md)
+— the canonical reference for directory/context structure, context boundaries,
+naming, and process conventions. Reviewers point to it in PRs.
+
 ## Local MVP
 
 This branch includes a dependency-light browser MVP under `priv/static`.

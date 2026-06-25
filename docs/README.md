@@ -15,6 +15,7 @@ datasets into generative music and synchronized visual art.
 | [03 — Domain Model](./03-domain-model.md) | Dataset, MidiSequence, polymorphic sources, mapping strategies, limits |
 | [04 — Tech Stack](./04-tech-stack.md) | Backend, frontend, MIDI service, hosting |
 | [05 — Roadmap](./05-roadmap.md) | V2 (external data sources, GraphQL), long-term architecture |
+| [09 — Style & Architecture Guidelines](./09-style-and-architecture-guidelines.md) | Canonical Elixir style/architecture reference: structure, context boundaries, naming, process conventions |
 
 ### Architecture Decision Records
 
