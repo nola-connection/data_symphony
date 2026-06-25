@@ -18,8 +18,11 @@ defmodule DataSymphonyWeb.AdminAuthPlugTest do
       auth_header = "Basic #{credentials}"
 
       conn =
-        Phoenix.ConnTest.build_conn(:get, "/dev/dashboard")
-        |> put_req_header("authorization", auth_header)
+        put_req_header(
+          Phoenix.ConnTest.build_conn(:get, "/dev/dashboard"),
+          "authorization",
+          auth_header
+        )
 
       # In dev mode, this should pass regardless
       result = AdminAuthPlug.call(conn, [])
