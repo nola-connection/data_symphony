@@ -59,7 +59,7 @@ defmodule DataSymphony.BlobStorageTest do
     test "both adapters implement the behaviour and its callbacks" do
       for module <- [Filesystem, S3] do
         Code.ensure_loaded!(module)
-        behaviours = module.__info__(:attributes) |> Keyword.get(:behaviour, [])
+        behaviours = Keyword.get(module.__info__(:attributes), :behaviour, [])
         assert BlobStorage in behaviours, "#{inspect(module)} must implement BlobStorage"
         assert function_exported?(module, :put, 2)
         assert function_exported?(module, :get, 1)

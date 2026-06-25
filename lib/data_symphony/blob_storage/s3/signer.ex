@@ -137,7 +137,7 @@ defmodule DataSymphony.BlobStorage.S3.Signer do
   end
 
   defp hmac(key, data), do: :crypto.mac(:hmac, :sha256, key, data)
-  defp sha256_hex(data), do: :crypto.hash(:sha256, data) |> Base.encode16(case: :lower)
+  defp sha256_hex(data), do: Base.encode16(:crypto.hash(:sha256, data), case: :lower)
 
   defp unreserved?(c)
        when c in ?A..?Z or c in ?a..?z or c in ?0..?9 or c in [?-, ?_, ?., ?~],
