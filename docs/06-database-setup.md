@@ -97,6 +97,9 @@ config :data_symphony, DataSymphony.Repo,
   socket_options: maybe_ipv6
 ```
 
+`maybe_ipv6` resolves to `[:inet6]` only when `ECTO_IPV6` is `"true"`, otherwise it is
+empty (IPv4). Neon is IPv4-only, so leave `ECTO_IPV6` unset for Neon deployments.
+
 ### Migrations in Production
 
 Migrations are run automatically during deployment via the release script. Ensure your CI/CD pipeline runs the release task.
@@ -106,7 +109,7 @@ Migrations are run automatically during deployment via the release script. Ensur
 | Variable | Development | Test | Production |
 |----------|-------------|------|------------|
 | `DATABASE_URL` | Not set (uses config/dev.exs) | Not set (uses config/test.exs) | Required |
-| `ECTO_IPV6` | Not set | Not set | Optional (set to "true" for IPv6) |
+| `ECTO_IPV6` | Not set | Not set | Leave unset for Neon (IPv4-only); only set to "true" when the database is reachable over IPv6 (e.g. Fly Managed Postgres) |
 | `POOL_SIZE` | 10 | 2*cores | Configurable (suggest 10-20) |
 
 ## Testing
