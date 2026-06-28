@@ -19,7 +19,7 @@ defmodule DataSymphonyWeb.Router do
   scope "/", DataSymphonyWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", UploadLive, :index
   end
 
   # Other scopes may use custom stacks.
