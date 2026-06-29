@@ -12,6 +12,20 @@ config :data_symphony, :env, config_env()
 # S3-compatible adapter in config/runtime.exs. See DataSymphony.BlobStorage.
 config :data_symphony, DataSymphony.BlobStorage, adapter: DataSymphony.BlobStorage.Filesystem
 
+# Upload-time dataset limits (policy, not data). Surfaced in the upload UI and
+# enforced by the parser. Defaults mirror docs/03-domain-model.md and may be
+# overridden per environment. See DataSymphony.Datasets.Limits.
+#
+# Today an over-limit upload is rejected outright. CSV-6 will add an opt-in
+# pop-up offering to auto-truncate a file to these caps and ingest it instead;
+# the caps below stay the single source of truth for that truncation. See
+# https://github.com/nola-connection/data_symphony/issues/65.
+config :data_symphony, DataSymphony.Datasets.Limits,
+  max_byte_size: 10_485_760,
+  max_row_count: 10_000,
+  max_column_count: 64,
+  max_cell_length: 1_024
+
 # Configures the endpoint
 config :data_symphony, DataSymphonyWeb.Endpoint,
   url: [host: "localhost"],
