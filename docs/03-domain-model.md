@@ -147,6 +147,11 @@ not in the database. Defaults:
 stored on the `Dataset` row for diagnostics — these are *measurements*, not
 the limits themselves.
 
+An over-limit upload is rejected today. [CSV-6](https://github.com/nola-connection/data_symphony/issues/65)
+will add an opt-in flow that offers to auto-truncate a file to these caps and
+ingest it instead; the caps above remain the single source of truth for that
+truncation.
+
 ## Entity relationships
 
 ```

@@ -16,16 +16,14 @@ defmodule DataSymphonyWeb.UploadLive do
   def mount(_params, _session, socket) do
     limits = Limits.all()
 
-    socket =
-      socket
-      |> assign(page_title: "Upload CSV", limits: limits, staged: [])
-      |> allow_upload(:dataset,
-        accept: ~w(.csv text/csv),
-        max_entries: 1,
-        max_file_size: limits.max_byte_size
-      )
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(page_title: "Upload CSV", limits: limits, staged: [])
+     |> allow_upload(:dataset,
+       accept: [".csv", "text/csv"],
+       max_entries: 1,
+       max_file_size: limits.max_byte_size
+     )}
   end
 
   @impl true
@@ -129,12 +127,10 @@ defmodule DataSymphonyWeb.UploadLive do
         {:ok, %{id: token, ref: stored, name: entry.client_name, size: entry.client_size}}
       end)
 
-    socket =
-      socket
-      |> update(:staged, &(staged ++ &1))
-      |> put_flash(:info, "Staged #{length(staged)} file(s) for parsing.")
-
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> update(:staged, &(staged ++ &1))
+     |> put_flash(:info, "Staged #{length(staged)} file(s) for parsing.")}
   end
 
   defp format_bytes(bytes) when bytes >= 1_048_576, do: "#{Float.round(bytes / 1_048_576, 1)} MB"

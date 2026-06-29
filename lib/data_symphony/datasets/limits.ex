@@ -7,6 +7,11 @@ defmodule DataSymphony.Datasets.Limits do
   surfaces these values so a rejected upload is understandable up front, and
   the parser enforces them when reading a file.
 
+  An over-limit upload is rejected today. CSV-6 will add an opt-in flow that
+  offers to auto-truncate a file to these caps and ingest it instead; these
+  values stay the single source of truth for that truncation. See
+  https://github.com/nola-connection/data_symphony/issues/65.
+
       config :data_symphony, DataSymphony.Datasets.Limits,
         max_byte_size: 10_485_760,
         max_row_count: 10_000,

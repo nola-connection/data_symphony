@@ -234,6 +234,16 @@ These are applied by `mix format` and/or enforced by Credo; the highlights:
 - Pipe (`|>`) for multi-step transforms; **don't pipe a single call** — write
   `String.downcase(s)`, not `s |> String.downcase()`. Start a pipeline from a
   bare value.
+- In LiveView/GenServer callbacks, **pipe the transform chain directly into the
+  returned `{:ok, socket}` / `{:noreply, socket}` tuple** instead of binding an
+  intermediate `socket =` first, when that chain is the whole callback body:
+
+  ```elixir
+  {:noreply,
+   socket
+   |> assign(:count, count)
+   |> put_flash(:info, "Saved")}
+  ```
 - Prefer literal atom lists (`[:pitch, :velocity]`) over `~w(...)a` sigils.
 - Use `with` for happy-path chains; use multi-line `with`/`else` when there is
   more than one clause or an `else`.
