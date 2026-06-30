@@ -13,7 +13,8 @@ defmodule DataSymphony.Datasets.LimitsTest do
 
   import Phoenix.LiveViewTest
 
-  alias DataSymphony.Datasets.{DatasetParser, Limits}
+  alias DataSymphony.Datasets.DatasetParser
+  alias DataSymphony.Datasets.Limits
 
   # Mirrors the defaults in config/config.exs and docs/03-domain-model.md.
   @defaults %{
