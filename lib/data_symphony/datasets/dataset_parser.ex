@@ -78,28 +78,25 @@ defmodule DataSymphony.Datasets.DatasetParser do
   defp reduce_line(raw, acc) do
     acc = %{acc | line: acc.line + 1, byte_size: acc.byte_size + byte_size(raw)}
 
-    if acc.byte_size > acc.limits.max_byte_size do
-      {:halt, add_error(acc, byte_error(acc))}
-    else
-      after_classify(classify(acc, raw))
-    end
-  end
-
-  defp after_classify(acc) do
-    if acc.row_count > acc.limits.max_row_count do
-      {:halt, add_error(acc, row_count_error(acc))}
-    else
+    with {:ok, acc} <- enforce_byte_limit(acc),
+         {:ok, acc} <- classify(acc, strip_eol(raw)) do
       {:cont, acc}
     end
   end
 
-  defp classify(acc, raw) do
-    line = strip_eol(raw)
+  defp enforce_byte_limit(acc) do
+    if acc.byte_size > acc.limits.max_byte_size do
+      {:halt, add_error(acc, byte_error(acc))}
+    else
+      {:ok, acc}
+    end
+  end
 
+  defp classify(acc, line) do
     cond do
-      String.trim(line) == "" -> acc
-      is_nil(acc.headers) -> set_header(acc, split_fields(line))
-      true -> process_row(acc, split_fields(line))
+      String.trim(line) == "" -> {:ok, acc}
+      is_nil(acc.headers) -> {:ok, set_header(acc, split_fields(line))}
+      true -> validate_row(acc, split_fields(line))
     end
   end
 
@@ -109,13 +106,21 @@ defmodule DataSymphony.Datasets.DatasetParser do
     check_cells(acc, fields)
   end
 
-  defp process_row(acc, fields) do
+  # Runs every per-row check in a single conditional. Returns `{:halt, acc}` for
+  # the hard row-count limit (which stops the stream) and `{:ok, acc}` — with any
+  # shape or cell errors accumulated — for everything else.
+  defp validate_row(acc, fields) do
     acc = %{acc | row_count: acc.row_count + 1}
 
-    if acc.row_count > acc.limits.max_row_count do
-      acc
-    else
-      check_cells(maybe_ragged_row_error(acc, length(fields)), fields)
+    cond do
+      acc.row_count > acc.limits.max_row_count ->
+        {:halt, add_error(acc, row_count_error(acc))}
+
+      length(fields) != acc.column_count ->
+        {:ok, add_error(acc, ragged_row_error(acc, length(fields)))}
+
+      true ->
+        {:ok, check_cells(acc, fields)}
     end
   end
 
@@ -124,14 +129,6 @@ defmodule DataSymphony.Datasets.DatasetParser do
       add_error(acc, column_count_error(acc, count))
     else
       acc
-    end
-  end
-
-  defp maybe_ragged_row_error(acc, count) do
-    if count == acc.column_count do
-      acc
-    else
-      add_error(acc, ragged_row_error(acc, count))
     end
   end
 
