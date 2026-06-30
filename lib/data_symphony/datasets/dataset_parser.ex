@@ -87,7 +87,7 @@ defmodule DataSymphony.Datasets.DatasetParser do
 
   defp after_classify(acc) do
     if acc.row_count > acc.limits.max_row_count do
-      {:halt, add_error(acc, row_error(acc))}
+      {:halt, add_error(acc, row_count_error(acc))}
     else
       {:cont, acc}
     end
@@ -97,7 +97,7 @@ defmodule DataSymphony.Datasets.DatasetParser do
     line = strip_eol(raw)
 
     cond do
-      blank?(line) -> acc
+      String.trim(line) == "" -> acc
       is_nil(acc.headers) -> set_header(acc, split_fields(line))
       true -> process_row(acc, split_fields(line))
     end
@@ -115,7 +115,7 @@ defmodule DataSymphony.Datasets.DatasetParser do
     if acc.row_count > acc.limits.max_row_count do
       acc
     else
-      check_cells(maybe_ragged_error(acc, length(fields)), fields)
+      check_cells(maybe_ragged_row_error(acc, length(fields)), fields)
     end
   end
 
@@ -127,11 +127,11 @@ defmodule DataSymphony.Datasets.DatasetParser do
     end
   end
 
-  defp maybe_ragged_error(acc, count) do
+  defp maybe_ragged_row_error(acc, count) do
     if count == acc.column_count do
       acc
     else
-      add_error(acc, ragged_error(acc, count))
+      add_error(acc, ragged_row_error(acc, count))
     end
   end
 
@@ -188,7 +188,7 @@ defmodule DataSymphony.Datasets.DatasetParser do
     }
   end
 
-  defp row_error(acc) do
+  defp row_count_error(acc) do
     %{
       type: :row_count_exceeded,
       message: "dataset exceeds the maximum of #{acc.limits.max_row_count} rows",
@@ -206,7 +206,7 @@ defmodule DataSymphony.Datasets.DatasetParser do
     }
   end
 
-  defp ragged_error(acc, count) do
+  defp ragged_row_error(acc, count) do
     %{
       type: :ragged_row,
       message: "row has #{count} columns; expected #{acc.column_count}",
@@ -228,8 +228,6 @@ defmodule DataSymphony.Datasets.DatasetParser do
     trimmed = String.trim_trailing(line, "\n")
     String.trim_trailing(trimmed, "\r")
   end
-
-  defp blank?(line), do: String.trim(line) == ""
 
   # Splits a single CSV line into fields, honoring double-quoted values and
   # escaped quotes (`""`). Matching is byte-based: the comma and quote markers
